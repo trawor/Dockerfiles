@@ -13,10 +13,18 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certifi
 
 # set default caddypath
 ENV CADDYPATH=/etc/.caddy
-VOLUME /etc/.caddy
+ENV VHOSTS_PATH=${CADDYPATH}/vhosts
 
+RUN mkdir -p ${VHOSTS_PATH} && \
+  echo "Hello Caddy" > /srv/index.html && \
+  echo $'0.0.0.0:80 {\n  root /srv \n}' > ${VHOSTS_PATH}/default.conf && \
+  echo $'import {%VHOSTS_PATH%}/*.conf' > /etc/Caddyfile
+
+VOLUME ${CADDYPATH}
 WORKDIR /srv
-RUN echo "Hello Caddy" > /srv/index.html
-RUN echo $'0.0.0.0:80 {\n  root /srv \n}' > /etc/Caddyfile
 
-ENTRYPOINT ["/bin/caddy", "--conf", "/etc/Caddyfile", "--log", "stdout"]
+RUN echo $'#!/bin/sh\nmkdir -p ${VHOSTS_PATH}\nexec "$@"' > /bin/entrypoint.sh && chmod +x /bin/entrypoint.sh
+ENTRYPOINT [ "/bin/entrypoint.sh" ]
+CMD [ "caddy","--agree","--conf","/etc/Caddyfile","--log","stdout" ]
+
+
