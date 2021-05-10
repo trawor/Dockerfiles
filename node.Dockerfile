@@ -1,7 +1,4 @@
-# Do We TRUST the 'FROM' Images? 
-# alpine:3.8 <- Offical Node 10.14.1
-
-FROM node:10.14.1-alpine
+FROM node:12-alpine
 LABEL maintainer="tw@travis.wang"
 
 # 改为中国科技大的镜像源，提速！

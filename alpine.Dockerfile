@@ -1,4 +1,4 @@
-FROM alpine:3.8
+FROM alpine:3.13
 LABEL maintainer="tw@travis.wang"
 
 # 改为中国科技大的镜像源，提速！
